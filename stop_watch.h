@@ -4,6 +4,7 @@
 #include <chrono>
 
 /// \todo should there be a reset method?
+template <class Duration>
 class stop_watch final
 {
 private:
@@ -11,7 +12,7 @@ private:
     using time_point = clock::time_point;
 
 public:
-    using duration = std::chrono::seconds;
+    using duration = Duration;
     using count_type = std::size_t;
 
     stop_watch() = default;
@@ -56,5 +57,8 @@ private:
     time_point m_start;
     duration m_duration;
 };
+
+using ms_watch = stop_watch<std::chrono::milliseconds>;
+using us_watch = stop_watch<std::chrono::microseconds>;
 
 #endif

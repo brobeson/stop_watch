@@ -2,9 +2,10 @@
 #include <iostream>
 #include <thread>
 
-std::ostream& operator<<(std::ostream& stream, const std::chrono::seconds& s)
+template <class Rep, class Period>
+std::ostream& operator<<(std::ostream& stream, const std::chrono::duration<Rep, Period>& d)
 {
-    stream << s.count() << "s";
+    stream << d.count();
     return stream;
 }
 
@@ -42,21 +43,21 @@ int main(int argc, char* argv[])
     {
         bool passing = true;
 
-        stop_watch watch;
+        ms_watch watch;
         watch.start();
         std::this_thread::sleep_for(2s);
         watch.stop();
-        passing = validate(watch.get(), 2s, "start/stop");
+        passing = validate(watch.get(), std::chrono::duration_cast<ms_watch::duration>(2s), "start/stop");
 
         watch.start();
         std::this_thread::sleep_for(1s);
         watch.lap();
-        std::this_thread::sleep_for(1s);
+        std::this_thread::sleep_for(2s);
         watch.lap();
         std::this_thread::sleep_for(1s);
         watch.stop();
-        passing = validate(watch.lap_count(), static_cast<stop_watch::count_type>(3), "3 laps") && passing;
-        passing = validate(watch.average(), 1s, "1s average") && passing;
+        passing = validate(watch.lap_count(), static_cast<watch_s::count_type>(3), "3 laps") && passing;
+        passing = validate(watch.average(), 1333ms, "1.3s average") && passing;
 
         if (passing)
             return EXIT_SUCCESS;
