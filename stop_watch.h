@@ -1,10 +1,17 @@
 #ifndef STOP_WATCH_H
 #define STOP_WATCH_H
 
+#include <chrono>
+
+/// \todo should there be a reset method?
 class stop_watch final
 {
+private:
+    using clock = std::chrono::steady_clock;
+    using time_point = clock::time_point;
+
 public:
-    using duration = std::chrono::microseconds;
+    using duration = std::chrono::seconds;
     using count_type = std::size_t;
 
     stop_watch() = default;
@@ -19,36 +26,35 @@ public:
     /// \name operations
     /// \{
 
-    void start();
-    void stop();
-    void lap();
+    void start()
+    {
+        m_laps = 0u;
+        m_start = clock::now();
+    }
+
+    void stop()
+    {
+        m_duration = std::chrono::duration_cast<duration>(clock::now() - m_start);
+        lap();
+    }
+
+    void lap() { ++m_laps; }
 
     /// \}
 
     /// \name accessors
     /// \{
 
-    duration get() const;
-    duration average() const;
-    count_type lap_count() const;
+    duration get() const { return m_duration; }
+    duration average() const { return get() / lap_count(); }
+    count_type lap_count() const { return m_laps; }
 
     /// \}
 
 private:
     count_type m_laps = 0u;
     time_point m_start;
-    duration m_run_time;
+    duration m_duration;
 };
-
-
-int main()
-{
-    stop_watch watch;
-    watch.start();
-    std::this_thread::sleep_for(20_s);
-    watch.stop();
-    std::cout << "Ran for " << watch.get().count() << " seconds.\n";
-    return EXIT_SUCCESS;
-}
 
 #endif

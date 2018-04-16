@@ -1,5 +1,12 @@
-//#include "stop_watch.hpp"
+#include "stop_watch.h"
 #include <iostream>
+#include <thread>
+
+std::ostream& operator<<(std::ostream& stream, const std::chrono::seconds& s)
+{
+    stream << s.count() << "s";
+    return stream;
+}
 
 /**
  * \brief Compare two values for equality.
@@ -30,12 +37,26 @@ bool validate(const T& actual, const T& expected, const std::string& test_name)
 
 int main(int argc, char* argv[])
 {
+    using namespace std::literals::chrono_literals;
     try
     {
         bool passing = true;
 
-        //passing = validate(1, 1, "one equals one") && passing;
-        //passing = validate(1, 2, "one equals two") && passing;
+        stop_watch watch;
+        watch.start();
+        std::this_thread::sleep_for(2s);
+        watch.stop();
+        passing = validate(watch.get(), 2s, "start/stop");
+
+        watch.start();
+        std::this_thread::sleep_for(1s);
+        watch.lap();
+        std::this_thread::sleep_for(1s);
+        watch.lap();
+        std::this_thread::sleep_for(1s);
+        watch.stop();
+        passing = validate(watch.lap_count(), static_cast<stop_watch::count_type>(3), "3 laps") && passing;
+        passing = validate(watch.average(), 1s, "1s average") && passing;
 
         if (passing)
             return EXIT_SUCCESS;

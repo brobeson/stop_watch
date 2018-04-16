@@ -22,6 +22,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED true)
 #)
 
 # create a unit test
+include(CTest)
 add_executable(stop_watch_test stop_watch_test.cpp)
 #target_link_libraries(stop_watch_test stop_watch)
 target_compile_options(stop_watch_test
@@ -29,3 +30,4 @@ target_compile_options(stop_watch_test
         -Werror
         -Wpedantic
 )
+add_test(NAME stop_watch_test COMMAND stop_watch_test)
